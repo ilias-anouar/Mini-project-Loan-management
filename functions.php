@@ -23,7 +23,7 @@ class Member
     }
     public function hash_pass($password)
     {
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password, PASSWORD_BCRYPT);
         return $password_hash;
     }
     public function check_member($mail){

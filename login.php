@@ -10,13 +10,13 @@ function test_input($data)
     return $data;
 }
 if (isset($_POST['login'])) {
-    $nickname = test_input($_POST["nickname"]);
-    $password = test_input($_POST["logpass"]);
+    $nickname = $_POST["nickname"];
+    // $password = ;
 
     $sql = "SELECT * FROM `members` WHERE `nickname`='$nickname'";
     $stmt = $conn->query($sql);
     if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        if (password_verify($password, $result['password']) && $result['penalty'] < 3) {
+        if (password_verify($_POST["login_pass"], $result['password'])) {
             if ($result['Role'] == 0) {
                 session_start();
                 $_SESSION['full_name'] = $result['full_name'];
@@ -30,9 +30,10 @@ if (isset($_POST['login'])) {
                 $_SESSION['nickname'] = $result['nickname'];
                 $_SESSION['password'] = $result['password'];
                 $_SESSION['id_member'] = $result['id_member'];
-                header("Location: ./admin/admin.php");
+                header("Location: ./Admin/admin.php");
             }
         } else {
+            echo $result['password'];
             $login_error = "You can't use your account any more";
         }
     } else {
@@ -118,8 +119,8 @@ if (isset($_POST['login'])) {
                                                     <i class="input-icon uil uil-user"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="password" name="logpass" class="form-style pass"
-                                                        placeholder="Your Password" id="logpass" autocomplete="off"
+                                                    <input type="password" name="login_pass" class="form-style pass"
+                                                        placeholder="Your Password" id="login_pass" autocomplete="off"
                                                         required="" title="Your own password">
                                                     <i class="togglePassword input-icon far fa-eye"
                                                         style="margin-left: 19rem; cursor: pointer;"></i>
