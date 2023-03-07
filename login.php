@@ -1,8 +1,6 @@
 <?php
 include "head.php";
-require "connect.php"
-?>
-<?php
+require "connect.php";
 function test_input($data)
 {
     $data = trim($data);
@@ -13,6 +11,23 @@ function test_input($data)
 if (isset($_POST['login'])) {
     $nickname = test_input($_POST["nickname"]);
     $password = test_input($_POST["logpass"]);
+
+    $sql = "SELECT * FROM `members` WHERE `nickname`='$nickname'";
+    $stmt = $conn->query($sql);
+    if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        if (password_verify($password, $result['password']) && $result['penalty'] < 3) {
+            session_start();
+            $_SESSION['full_name'] = $result['full_name'];
+            $_SESSION['nickname'] = $result['nickname'];
+            $_SESSION['password'] = $result['password'];
+            $_SESSION['id_member'] = $result['id_member'];
+            header("Location: ./user/user.php");
+        } else {
+            $login_error = "You can't use your account any more";
+        }
+    } else {
+        $login_error = "This account not exist";
+    }
 
 } elseif (isset($_POST['signup'])) {
     $name = test_input($_POST['signname']);
@@ -26,6 +41,11 @@ if (isset($_POST['login'])) {
     $password = test_input($_POST['password']);
     $cpassword = test_input($_POST['cpassword']);
     $agree = $_POST['agree'];
+    if ($password == $cpassword) {
+        $password_hash = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
+    }
+
 }
 ?>
 
@@ -61,23 +81,23 @@ if (isset($_POST['login'])) {
                                                         title="Your own unique nickname">
                                                     <i class="input-icon uil uil-user"></i>
                                                 </div>
-                                                <?php
-                                                if (isset($nickname_error)) {
-                                                    $element =
-                                                        "<div class=\"alert alert-danger mt-2 d-flex align-items-center\" role=\"alert\">
-                                                            <div>
-                                                                $nickname_error
-                                                            </div>
-                                                        </div>";
-                                                    echo $element;
-                                                }
-                                                ?>
                                                 <div class="form-group mt-2">
                                                     <input type="password" name="logpass" class="form-style"
                                                         placeholder="Your Password" id="logpass" autocomplete="off"
                                                         required="" title="Your own password">
                                                     <i class="input-icon uil uil-lock-alt"></i>
                                                 </div>
+                                                <?php
+                                                if (isset($login_error)) {
+                                                    $element =
+                                                        "<div class=\"alert alert-danger mt-2 d-flex align-items-center\" role=\"alert\">
+                                                            <div>
+                                                                $login_error
+                                                            </div>
+                                                        </div>";
+                                                    echo $element;
+                                                }
+                                                ?>
                                                 <button name="login" type="submit" class="btn mt-4">submit</button>
                                                 <p class="mb-0 mt-4 text-center"><a href="#0" class="link">Forgot your
                                                         password?</a></p>
