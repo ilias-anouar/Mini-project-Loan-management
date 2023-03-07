@@ -26,5 +26,12 @@ class Member
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         return $password_hash;
     }
+    public function check_member($mail){
+        if (strpos($mail,"admin")==0 & strpos($mail, "choise") == 8) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
 ?>

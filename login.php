@@ -17,12 +17,21 @@ if (isset($_POST['login'])) {
     $stmt = $conn->query($sql);
     if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
         if (password_verify($password, $result['password']) && $result['penalty'] < 3) {
-            session_start();
-            $_SESSION['full_name'] = $result['full_name'];
-            $_SESSION['nickname'] = $result['nickname'];
-            $_SESSION['password'] = $result['password'];
-            $_SESSION['id_member'] = $result['id_member'];
-            header("Location: ./user/user.php");
+            if ($result['Role'] == 0) {
+                session_start();
+                $_SESSION['full_name'] = $result['full_name'];
+                $_SESSION['nickname'] = $result['nickname'];
+                $_SESSION['password'] = $result['password'];
+                $_SESSION['id_member'] = $result['id_member'];
+                header("Location: ./user/user.php");
+            } else {
+                session_start();
+                $_SESSION['full_name'] = $result['full_name'];
+                $_SESSION['nickname'] = $result['nickname'];
+                $_SESSION['password'] = $result['password'];
+                $_SESSION['id_member'] = $result['id_member'];
+                header("Location: ./admin/admin.php");
+            }
         } else {
             $login_error = "You can't use your account any more";
         }
@@ -43,17 +52,25 @@ if (isset($_POST['login'])) {
     $cpassword = test_input($_POST['cpassword']);
     $member = new Member($name, $mail, $address, $phone, $cin, $date, $occupation, $nickname);
 
-    $check = "SELECT * FROM `members` WHERE `email`='$member->mail'";
-    $stmt = $conn->query($check);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (is_array($result)) {
-        $nickname_error = "This email is already used";
-    }
-    $check = "SELECT * FROM `members` WHERE `nickname`='$member->nickname'";
-    $stmt = $conn->query($check);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (is_array($result)) {
-        $mail_error = "This nickname is already used";
+    $check_mail = "SELECT * FROM `members` WHERE `email`='$member->mail'";
+    $stmt = $conn->query($check_mail);
+    $checked_mail = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $check_nickname = "SELECT * FROM `members` WHERE `nickname`='$member->nickname'";
+    $stmt = $conn->query($check_nickname);
+    $checked_nickname = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (is_array($checked_mail)) {
+        $mail_error = "This email is already used";
+    } elseif (is_array($check_nickname)) {
+        $nickname_error = "This nickname is already used";
+    } else {
+        $password_hash = $member->hash_pass($password);
+        $role = $member->check_member($mail);
+        $insert = "INSERT INTO `members` (`id_member`, `full_name`, `address`, `email`, `phone`, `C_I_N`, `date_of_birth`, `type`, `nickname`, `password`, `opening_date`, `penalty`, `Role`) 
+        VALUES (NULL, '$member->name', '$member->address', '$member->mail', '$member->phone', '$member->cin', '$member->date', '$member->occupation','$member->nickname','$password_hash',NOW(), '0', '$role')";
+        $stmt = $conn->query($insert);
+        $signed_up = "your account is created successfully please log in to your account";
+        header("Location: login.php");
     }
 
 }
@@ -72,6 +89,15 @@ if (isset($_POST['login'])) {
         <div class="container">
             <div class="row justify-content-center mt-4">
                 <div class="col-12 text-center align-self-center py-2">
+                    <?php
+                    if (isset($signed_up)) {
+                        $element =
+                            "<div class=\"alert alert-success\" role=\"alert\">
+                                $signed_up
+                            </div>";
+                        echo $element;
+                    }
+                    ?>
                     <div class="section pb-5 pt-2 pt-sm-2 text-center">
                         <h6 class="mb-0 pb-3"><span>Log In </span><span>Sign Up</span></h6>
                         <input class="checkbox" type="checkbox" id="reg-log" name="reg-log" />

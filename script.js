@@ -3,6 +3,7 @@ signup_form.addEventListener("submit", (ev) => {
   let Term_conditions = document.getElementsByName("agree");
   let confirmation_pass = document.getElementById("cpassword");
   let password = document.getElementById("password");
+  let checked = [];
   let check = true;
   while (check) {
     if (password.value != confirmation_pass.value) {
@@ -12,6 +13,9 @@ signup_form.addEventListener("submit", (ev) => {
       let pass_error = "Password confirmation in incorrect";
       let pass_error_holder = document.getElementById("pass_error");
       pass_error_holder.innerHTML = pass_error;
+    } else {
+      checked.push(true);
+      pass_error_holder.innerHTML = "";
     }
     if (Term_conditions.checked == false) {
       ev.preventDefault();
@@ -19,13 +23,14 @@ signup_form.addEventListener("submit", (ev) => {
       let check_error = document.getElementById("check_error");
       check_error.innerHTML = error;
     } else {
+      checked.push(true);
       check_error.innerHTML = "";
     }
     check = false;
   }
-  let box = document.getElementsByName("reg-log");
-  box.checked=true
-
+  if (checked.length == 2) {
+    signup_form.reset();
+  }
 });
 
 const togglePassword = document.querySelectorAll(".togglePassword");
