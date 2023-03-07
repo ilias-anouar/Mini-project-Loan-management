@@ -1,16 +1,30 @@
-<?php 
+<?php
 class Member
 {
-    private $name;
-    private $mail;
-    private $phone;
-    private $cin;
-    private $date;
-    private $occupation;
-    private $nickname;
-    private $password;
-    public function __construct($name, $mail,$phone, ){
+    public $name;
+    public $mail;
+    public $phone;
+    public $address;
+    public $cin;
+    public $date;
+    public $occupation;
+    public $nickname;
 
+    public function __construct($name, $mail, $address, $phone, $cin, $date, $occupation, $nickname)
+    {
+        $this->name = $name;
+        $this->mail = $mail;
+        $this->address = $address;
+        $this->phone = $phone;
+        $this->cin = $cin;
+        $this->date = $date;
+        $this->occupation = $occupation;
+        $this->nickname = $nickname;
+    }
+    public function hash_pass($password)
+    {
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        return $password_hash;
     }
 }
 ?>

@@ -1,6 +1,7 @@
 <?php
 include "head.php";
 require "connect.php";
+include "functions.php";
 function test_input($data)
 {
     $data = trim($data);
@@ -40,10 +41,19 @@ if (isset($_POST['login'])) {
     $nickname = test_input($_POST['nickname']);
     $password = test_input($_POST['password']);
     $cpassword = test_input($_POST['cpassword']);
-    $agree = $_POST['agree'];
-    if ($password == $cpassword) {
-        $password_hash = password_hash($_POST["password"], PASSWORD_DEFAULT);
+    $member = new Member($name, $mail, $address, $phone, $cin, $date, $occupation, $nickname);
 
+    $check = "SELECT * FROM `members` WHERE `email`='$member->mail'";
+    $stmt = $conn->query($check);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (is_array($result)) {
+        $nickname_error = "This email is already used";
+    }
+    $check = "SELECT * FROM `members` WHERE `nickname`='$member->nickname'";
+    $stmt = $conn->query($check);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (is_array($result)) {
+        $mail_error = "This nickname is already used";
     }
 
 }
@@ -82,9 +92,11 @@ if (isset($_POST['login'])) {
                                                     <i class="input-icon uil uil-user"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="password" name="logpass" class="form-style"
+                                                    <input type="password" name="logpass" class="form-style pass"
                                                         placeholder="Your Password" id="logpass" autocomplete="off"
                                                         required="" title="Your own password">
+                                                    <i class="togglePassword input-icon far fa-eye"
+                                                        style="margin-left: 19rem; cursor: pointer;"></i>
                                                     <i class="input-icon uil uil-lock-alt"></i>
                                                 </div>
                                                 <?php
@@ -109,69 +121,113 @@ if (isset($_POST['login'])) {
                                     <div class="center-wrap">
                                         <div class="section text-center">
                                             <h4 class="mb-4 pb-3">Sign Up</h4>
-                                            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
+                                            <form id="signup_form"
+                                                action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>"
                                                 method="post">
                                                 <div class="form-group">
-                                                    <input type="text" name="signname" class="form-style"
-                                                        placeholder="Your Full Name" id="signname" autocomplete="off"
+                                                    <input type="text" name="signname" class="form-style" value="<?php if (isset($name)) {
+                                                        echo $name;
+                                                    } ?>" placeholder="Your Full Name" id="signname" autocomplete="off"
                                                         required="" pattern="^[a-zA-Z-' ]+$">
                                                     <i class="input-icon uil uil-user"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="email" name="email" class="form-style"
-                                                        placeholder="Your Email" id="email" autocomplete="off"
+                                                    <input type="email" name="email" class="form-style" value="<?php if (isset($mail)) {
+                                                        echo $mail;
+                                                    } ?>" placeholder="Your Email" id="email" autocomplete="off"
                                                         required="" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                                                     <i class="input-icon uil uil-at"></i>
                                                 </div>
+                                                <?php
+                                                if (isset($mail_error)) {
+                                                    $element =
+                                                        "<div class=\"alert alert-danger mt-2 d-flex align-items-center\" role=\"alert\">
+                                                            <div>
+                                                                $mail_error
+                                                            </div>
+                                                        </div>";
+                                                    echo $element;
+                                                }
+                                                ?>
                                                 <div class="form-group mt-2">
-                                                    <input type="text" name="address" class="form-style"
-                                                        placeholder="Your address" id="address" autocomplete="off"
+                                                    <input type="text" name="address" class="form-style" value="<?php if (isset($address)) {
+                                                        echo $address;
+                                                    } ?>" placeholder="Your address" id="address" autocomplete="off"
                                                         required="" pattern="^[a-zA-Z-' -\d]+$">
                                                     <i class="input-icon uil uil-location-pin-alt"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="tel" name="phone" class="form-style"
-                                                        placeholder="Your phone" id="phone" autocomplete="off"
+                                                    <input type="tel" name="phone" class="form-style" value="<?php if (isset($phone)) {
+                                                        echo $phone;
+                                                    } ?>" placeholder="Your phone" id="phone" autocomplete="off"
                                                         required="" pattern="^(06|07|05)\d{8}">
                                                     <i class="input-icon uil uil-phone-alt"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="text" name="cin" class="form-style"
-                                                        placeholder="Your C.I.N" id="cin" autocomplete="off" required=""
-                                                        pattern="^[a-zA-Z-' -\d]+$">
+                                                    <input type="text" name="cin" class="form-style" value="<?php if (isset($cin)) {
+                                                        echo $cin;
+                                                    } ?>" placeholder="Your C.I.N" id="cin" autocomplete="off"
+                                                        required="" pattern="^[a-zA-Z-' -\d]+$">
                                                     <i class="input-icon uil uil-postcard"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="date" name="date" class="form-style"
-                                                        placeholder="Your birth date" id="date" autocomplete="off"
+                                                    <input type="date" name="date" class="form-style" value="<?php if (isset($date)) {
+                                                        echo $date;
+                                                    } ?>" placeholder="Your birth date" id="date" autocomplete="off"
                                                         required="">
                                                     <i class="input-icon uil uil-calender"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="text" name="occupation" class="form-style"
-                                                        placeholder="Your occupation" id="occupation" autocomplete="off"
-                                                        required="" pattern="(Student|officials|housewife)">
+                                                    <input type="text" name="occupation" class="form-style" value="<?php if (isset($occupation)) {
+                                                        echo $occupation;
+                                                    } ?>" placeholder="Your occupation" id="occupation"
+                                                        autocomplete="off" required=""
+                                                        pattern="(Student|officials|housewife)"
+                                                        title="Student/officials/housewife...">
                                                     <i class="input-icon uil uil-smile"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="text" name="nickname" class="form-style"
-                                                        placeholder="Enter nickname" id="nickname" autocomplete="off"
+                                                    <input type="text" name="nickname" class="form-style" value="<?php if (isset($nickname)) {
+                                                        echo $nickname;
+                                                    } ?>" placeholder="Enter nickname" id="nickname" autocomplete="off"
                                                         required="" pattern="[a-zA-Z]+">
                                                     <i class="input-icon uil uil-user-circle"></i>
                                                 </div>
+                                                <?php
+                                                if (isset($nickname_error)) {
+                                                    $element =
+                                                        "<div class=\"alert alert-danger mt-2 d-flex align-items-center\" role=\"alert\">
+                                                            <div>
+                                                                $nickname_error
+                                                            </div>
+                                                        </div>";
+                                                    echo $element;
+                                                }
+                                                ?>
                                                 <div class="form-group mt-2">
-                                                    <input type="password" name="password" class="form-style"
-                                                        placeholder="your password" id="password" autocomplete="off"
-                                                        required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                                                    <input type="password" name="password" class="form-style pass"
+                                                        value="<?php if (isset($password)) {
+                                                            echo $password;
+                                                        } ?>" placeholder="your password" id="password"
+                                                        autocomplete="off" required=""
+                                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
                                                         title="Must contain at least one  number and one uppercase and lowercase letter, and at least 8 or more characters">
+                                                    <i class="togglePassword input-icon far fa-eye"
+                                                        style="margin-left: 19rem; cursor: pointer;"></i>
                                                     <i class="input-icon uil uil-lock-alt"></i>
                                                 </div>
                                                 <div class="form-group mt-2">
-                                                    <input type="password" name="cpassword" class="form-style"
-                                                        placeholder="Conform password" id="cpassword" autocomplete="off"
-                                                        required="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                                                    <input type="password" name="cpassword" class="form-style pass"
+                                                        value="<?php if (isset($cpassword)) {
+                                                            echo $cpassword;
+                                                        } ?>" placeholder="Conform password" id="cpassword"
+                                                        autocomplete="off" required=""
+                                                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                                                    <i class="togglePassword input-icon far fa-eye"
+                                                        style="margin-left: 19rem; cursor: pointer;"></i>
                                                     <i class="input-icon uil uil-lock-alt"></i>
                                                 </div>
+                                                <p id="pass_error"></p>
                                                 <div class="form-group mt-2">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" value="agree"
@@ -184,6 +240,7 @@ if (isset($_POST['login'])) {
                                                             data-bs-target="#term&conditions">Term & condition of
                                                             user</a>
                                                     </div>
+                                                    <p id="check_error"></p>
                                                 </div>
                                                 <button name="signup" type="submit" class="btn mt-4">submit</button>
                                             </form>
