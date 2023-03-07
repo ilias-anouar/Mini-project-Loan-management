@@ -24,7 +24,7 @@ include "../head.php";
                             <a class="nav-link" href="#">My reservations</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#"></a>
+                            <button type="button" class="btn rounded-0 fs-4">Profile</button>
                         </li>
                     </ul>
                 </div>
