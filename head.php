@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
     <script src="script.js" async="false"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="cards.css">
     <link rel="stylesheet" href="../style.css">
     <title>Choice library</title>
 </head>

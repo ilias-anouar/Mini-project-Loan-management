@@ -1,7 +1,8 @@
 <?php
 session_start();
 include "../head.php";
-?>
+include "reservation.php"
+    ?>
 
 <body>
     <header>
@@ -34,7 +35,7 @@ include "../head.php";
     <main>
         <section class="d-flex justify-content-center mt-5">
             <form method="post">
-                <div class="row g-3 align-items-center border border-secondary border-2 rounded pb-3 fs-5 px-3">
+                <div class="row g-3 align-items-center border border-secondary border-2 rounded pb-3 fs-5 px-3 fw-bold">
                     <div class="col-auto">
                         <label for="inputPassword6" class="col-form-label">Type</label>
                     </div>
@@ -63,9 +64,32 @@ include "../head.php";
                 </div>
             </form>
         </section>
-        <section>
-            <h2>New books</h2><br>
-            <hr>
+        <section class="px-5 mt-5">
+            <div class="px-5">
+                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                    New books
+                </div>
+                <div class="d-flex cards">
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img src="../images/a-Dolls-house.jpg" alt="Avatar" style="width:310px;height:400px;">
+                            </div>
+                            <div class="flip-card-back">
+                                <h2 class="mt-5 fs-4">a Dolls house</h2>
+                                <p class="text-black">Fyodor Dostoevsky</p>
+                                <p class="text-black">1928</p>
+                                <p class="text-black">Good condition</p>
+                                <form action="reservation.php" method="post">
+                                    <input type="hidden" name="id" value="ilias is the best">
+                                    <button type="submit" name="Reserve" class="reservation px-4 py-2"
+                                        data-bs-toggle="modal" data-bs-target="#reservation">Reserve</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 </body>
