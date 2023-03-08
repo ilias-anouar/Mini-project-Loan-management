@@ -1,8 +1,15 @@
 <?php
 session_start();
 include "../head.php";
-include "reservation.php"
-    ?>
+include "../connect.php";
+// include "reservation.php"
+if (isset($_POST['Reserve'])) {
+    $id_book = $_POST['id'];
+    $sql = "SELECT * FROM `Books` WHERE `id_book`='$id_book'";
+    $stmt = $conn->query($sql);
+    $reserve = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+?>
 
 <body>
     <header>
@@ -80,7 +87,7 @@ include "reservation.php"
                                 <p class="text-black">Fyodor Dostoevsky</p>
                                 <p class="text-black">1928</p>
                                 <p class="text-black">Good condition</p>
-                                <form action="reservation.php" method="post">
+                                <form method="post">
                                     <input type="hidden" name="id" value="ilias is the best">
                                     <button type="submit" name="Reserve" class="reservation px-4 py-2"
                                         data-bs-toggle="modal" data-bs-target="#reservation">Reserve</button>
@@ -92,6 +99,32 @@ include "reservation.php"
             </div>
         </section>
     </main>
+    <!-- modal reservations -->
+    <div class="modal fade" id="reservation" tabindex="-1" aria-labelledby="reservation" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <div class="card">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="../images/a-Dolls-house.jpg" alt="book image" class="img-fluid rounded-start">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body p-5">
+                                    <h5 class="card-title text-black">Book title : <?php echo $reserve['title']?></h5>
+                                    <p class="card-text text-black">written by : <?php echo $reserve['author'] ?></p>
+                                    <p class="card-text text-black">Published in : <?php echo $reserve['publishing_date'] ?></p>
+                                    <p class="card-text text-black">State : <?php echo $reserve['state']?></p>
+                                    <p class="text-danger">NB*: every reservation last for 24H </p>
+                                    <!-- <button type="submit" name="confirmation" class="confirmation">Confirm</button> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
