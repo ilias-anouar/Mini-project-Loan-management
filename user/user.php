@@ -90,7 +90,7 @@ include "../head.php";
                                 <p class="text-black">1928</p>
                                 <p class="text-black">Good condition</p>
                                 <form id="reserve" action="" method="post">
-                                    <input type="hidden" name="id" value="56">
+                                    <input type="hidden" id="input" name="id" value="56">
                                     <button type="submit" name="Reserve" onclick="submitForm(event)"
                                         class="reservation px-4 py-2">Reserve</button>
                                 </form>
@@ -112,10 +112,13 @@ include "../head.php";
                                 <img src="" alt="book image" id="book-image" class="img-fluid rounded-start">
                             </div>
                             <div class="col-md-8">
-                                <div class="card-body p-5">
-                                    loading...
-                                </div>
-                                <!-- <button type="submit" name="confirmation" class="confirmation">Confirm</button> -->
+                                <form action="confirmation.php" method="get">
+                                    <div class="card-body p-5">
+                                        loading...
+                                    </div>
+                                    <input type="text">
+                                    <button type="submit" name="confirmation" class="confirmation">Confirm</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -137,6 +140,7 @@ include "../head.php";
                     var response = JSON.parse(xhr.responseText);
                     document.getElementById("reservation-modal").querySelector(".card-body").innerHTML = response.details;
                     document.getElementById("book-image").src = response.image;
+                    document.getElementById("input").value =  ;
                     $('#reservation-modal').modal('show');
                 }
             }
