@@ -75,7 +75,6 @@
     color: rgb(195, 175, 63);
     background-color: #fff;
 }
-
 .cards {
-    gap: 6em !important;
+    gap: 5em !important;
 }

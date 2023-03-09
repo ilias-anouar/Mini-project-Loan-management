@@ -20,8 +20,10 @@ if (!$reserve) {
         . '<p class="card-text text-black">Written by : ' . $reserve['author'] . '</p>'
         . '<p class="card-text text-black">Published in : ' . $reserve['publishing_date'] . '</p>'
         . '<p class="card-text text-black">State : ' . $reserve['state'] . '</p>'
-        . '<p class="text-danger">NB* : every reservation last for 24H </p>',
-        "image" => '../' . $reserve['image']
+        . '<p class="card-text text-black">Number of pages : ' . $reserve['pages'] . '</p>'
+        . '<p class="card-text text-black">Type : ' . $reserve['type'] . '</p>',
+        "image" => '../' . $reserve['image'],
+        "input" => $reserve['Id_book']
     );
 
     // Encode the response as JSON and output it

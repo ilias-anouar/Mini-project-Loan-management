@@ -1,17 +1,32 @@
 <?php
 session_start();
 include "../head.php";
-// include "../connect.php";
-// // include "reservation.php"
-// if (isset($_POST['Reserve'])) {
-//     $id_book = $_POST['id'];
-//     echo $id_book;
-//     // $sql = "SELECT * FROM `Books` WHERE `id_book`='$id_book'";
-//     // $stmt = $conn->query($sql);
-//     // $reserve = $stmt->fetch(PDO::FETCH_ASSOC);
-// }
-?>
+include "../connect.php";
+// $sql = "SELECT * FROM `Books` WHERE `date_of_purchase` >= CURDATE() ORDER BY `date_of_purchase` ASC LIMIT 4";
+// Get the current date
+$current_date = date('Y-m-d');
 
+// Prepare and execute the query
+try {
+    $stmt = $conn->prepare('SELECT * FROM Books WHERE state="New" ORDER BY ABS(DATEDIFF(date_of_purchase, NOW())) ASC LIMIT 4');
+    $stmt->execute();
+} catch (PDOException $e) {
+    echo 'Error executing query: ' . $e->getMessage();
+    exit();
+}
+
+try {
+    $books = $conn->prepare('SELECT * FROM Books WHERE state="Good condition" LIMIT 8');
+    $books->execute();
+} catch (PDOException $e) {
+    echo 'Error executing query: ' . $e->getMessage();
+    exit();
+}
+
+// Fetch the results
+$new_books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$books = $books->fetchAll(PDO::FETCH_ASSOC);
+?>
 <body>
     <header>
         <nav class="navbar navbar-expand-lg bg-warning-subtle">
@@ -24,7 +39,7 @@ include "../head.php";
                 <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Home</a>
+                            <a class="nav-link" href="user.php">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">News</a>
@@ -78,25 +93,81 @@ include "../head.php";
                     New books
                 </div>
                 <div class="d-flex cards">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <img src="../images/a-Dolls-house.jpg" alt="book-cover"
-                                    style="width:310px;height:400px;">
-                            </div>
-                            <div class="flip-card-back">
-                                <h2 class="mt-5 fs-4">a Dolls house</h2>
-                                <p class="text-black">Fyodor Dostoevsky</p>
-                                <p class="text-black">1928</p>
-                                <p class="text-black">Good condition</p>
-                                <form id="reserve" action="" method="post">
-                                    <input type="hidden" id="input" name="id" value="56">
-                                    <button type="submit" name="Reserve" onclick="submitForm(event)"
-                                        class="reservation px-4 py-2">Reserve</button>
-                                </form>
+                    <?php
+                    foreach ($new_books as $book) {
+                        ?>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img src="../<?php echo $book['image'] ?>" alt="book-cover"
+                                        style="width:310px;height:400px;">
+                                </div>
+                                <div class="flip-card-back">
+                                    <h2 class="mt-5 fs-4">
+                                        <?php echo $book['title'] ?>
+                                    </h2>
+                                    <p class="text-black">
+                                        <?php echo $book['author'] ?>
+                                    </p>
+                                    <p class="text-black">
+                                        <?php echo $book['publishing_date'] ?>
+                                    </p>
+                                    <p class="text-black">
+                                        <?php echo $book['state'] ?>
+                                    </p>
+                                    <form id="reserve" action="" method="post">
+                                        <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
+                                        <button type="submit" name="Reserve" class="reservation px-4 py-2"
+                                            data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </div>
+        </section>
+        <section class="px-5 mt-5 mb-5">
+            <div class="px-5">
+                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                    books
+                </div>
+                <div class="d-flex flex-wrap" style="gap: 5em;">
+                    <?php
+                    foreach ($books as $book) {
+                        ?>
+                        <div class="flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <img src="../<?php echo $book['image'] ?>" alt="book-cover"
+                                        style="width:310px;height:400px;">
+                                </div>
+                                <div class="flip-card-back">
+                                    <h2 class="mt-5 fs-4">
+                                        <?php echo $book['title'] ?>
+                                    </h2>
+                                    <p class="text-black">
+                                        <?php echo $book['author'] ?>
+                                    </p>
+                                    <p class="text-black">
+                                        <?php echo $book['publishing_date'] ?>
+                                    </p>
+                                    <p class="text-black">
+                                        <?php echo $book['state'] ?>
+                                    </p>
+                                    <form id="reserve" action="" method="post">
+                                        <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
+                                        <button type="submit" name="Reserve" class="reservation px-4 py-2"
+                                            data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                    ?>
                 </div>
             </div>
         </section>
@@ -110,13 +181,14 @@ include "../head.php";
                         <div class="row g-0">
                             <div class="col-md-4">
                                 <img src="" alt="book image" id="book-image" class="img-fluid rounded-start">
+                                <!-- <p class="text-danger">NB* : every reservation last for 24H </p> -->
                             </div>
                             <div class="col-md-8">
                                 <form action="confirmation.php" method="get">
                                     <div class="card-body p-5">
                                         loading...
                                     </div>
-                                    <input type="text">
+                                    <input type="hidden" id="input">
                                     <button type="submit" name="confirmation" class="confirmation">Confirm</button>
                                 </form>
                             </div>
@@ -126,26 +198,29 @@ include "../head.php";
             </div>
         </div>
     </div>
+    <?php 
+    include "../footer.php"
+    ?>
     <script>
-        function submitForm(event) {
-            event.preventDefault(); // Prevent the form from submitting normally
-            var form = document.getElementById("reserve");
-            var item_id = form.elements["id"].value;
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "process_reservation.php", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    // Display the reservation details in the modal
-                    var response = JSON.parse(xhr.responseText);
-                    document.getElementById("reservation-modal").querySelector(".card-body").innerHTML = response.details;
-                    document.getElementById("book-image").src = response.image;
-                    document.getElementById("input").value =  ;
+        $(document).on('click', '.reservation', function () {
+            event.preventDefault();
+            var bookid = $(this).data('bookid');
+            $.ajax({
+                url: 'process_reservation.php',
+                type: 'POST',
+                data: { id: bookid },
+                dataType: 'json',
+                success: function (response) {
+                    $('#reservation-modal .card-body').html(response.details);
+                    $('#reservation-modal #book-image').attr('src', response.image);
+                    $('#reservation-modal #input').val(response.input);
                     $('#reservation-modal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error:', error);
                 }
-            }
-            xhr.send("id=" + encodeURIComponent(item_id));
-        }
+            });
+        });
     </script>
 </body>
 
