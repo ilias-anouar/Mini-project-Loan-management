@@ -10,16 +10,23 @@ $states = $conn->query($state);
 $types = $types->fetchAll(PDO::FETCH_ASSOC);
 $states = $states->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_POST['search'])) {
+    $search_param = array();
     if (!empty($_POST['type'])) {
         $search_param[] = "type = '{$_POST['type']}'";
     }
     if (!empty($_POST['state'])) {
         $search_param[] = "state = '{$_POST['state']}'";
     }
-    if (!empty($_POST['Title'])) {
-        $search_param[] = "title LIKE '{$_POST['title']}'";
+    if (!empty($_POST['title'])) {
+        $search_param[] = "title LIKE '%{$_POST['title']}'";
     }
-    $filter = ("SELECT * FROM Books where" . implode(" AND ", $search_param));
+
+    // calculate the start index based on the current page number and the number of results per page
+    $filter = "SELECT * FROM Books";
+    if (!empty($search_param)) {
+        $filter .= " WHERE " . implode(" AND ", $search_param);
+    }
+
     $filter = $conn->query($filter);
     $result = $filter->fetchAll(PDO::FETCH_ASSOC);
 } else {
@@ -67,7 +74,7 @@ if (isset($_POST['search'])) {
                             <a class="nav-link" href="#">News</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">My reservations</a>
+                            <a class="nav-link" href="reservation.php">My reservations</a>
                         </li>
                         <li class="nav-item">
                             <button type="button" class="btn rounded-0 fs-4">Profile</button>
@@ -113,10 +120,10 @@ if (isset($_POST['search'])) {
                         </select>
                     </div>
                     <div class="col-auto">
-                        <label for="Title" class="col-form-label">Title</label>
+                        <label for="title" class="col-form-label">Title</label>
                     </div>
                     <div class="col-auto">
-                        <input type="select" id="Title" name="Title" class="form-control"
+                        <input type="select" id="title" name="title" class="form-control"
                             aria-describedby="passwordHelpInline">
                     </div>
                     <div class="col-auto">
@@ -133,7 +140,7 @@ if (isset($_POST['search'])) {
                     <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
                         Your search result
                     </div>
-                    <div class="d-flex cards">
+                    <div class="d-flex flex-wrap" style="gap: 5em;">
                         <?php
                         foreach ($result as $book) {
                             ?>
@@ -164,11 +171,13 @@ if (isset($_POST['search'])) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </section>
-                <?php
+                            <?php
                         }
+                        ?>
+                    </div>
+                </div>
+            </section>
+            <?php
         } else {
             ?>
             <section class="px-5 mt-5">
