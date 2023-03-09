@@ -17,7 +17,7 @@ class Member
         $this->address = $address;
         $this->phone = $phone;
         $this->cin = $cin;
-        $this->date = $date;
+        $this->date = $date; 
         $this->occupation = $occupation;
         $this->nickname = $nickname;
     }
@@ -33,5 +33,7 @@ class Member
             return false;
         }
     }
+
 }
+
 ?>

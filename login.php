@@ -42,7 +42,7 @@ if (isset($_POST['login'])) {
 
 } elseif (isset($_POST['signup'])) {
     $name = test_input($_POST['signname']);
-    $mail = test_input($_POST['email']);
+    $mail = test_input($_POST['email']); 
     $address = test_input($_POST['address']);
     $phone = test_input($_POST['phone']);
     $cin = test_input($_POST['cin']);
@@ -51,6 +51,7 @@ if (isset($_POST['login'])) {
     $nickname = test_input($_POST['nickname']);
     $password = test_input($_POST['password']);
     $cpassword = test_input($_POST['cpassword']);
+    
     $member = new Member($name, $mail, $address, $phone, $cin, $date, $occupation, $nickname);
 
     $check_mail = "SELECT * FROM `members` WHERE `email`='$member->mail'";
