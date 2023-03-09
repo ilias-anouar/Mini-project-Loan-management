@@ -3,8 +3,25 @@ session_start();
 include "../head.php";
 include "../connect.php";
 
+$type = "SELECT DISTINCT `type` FROM `books`";
+$state = "SELECT DISTINCT `state` FROM `books`";
+$types = $conn->query($type);
+$states = $conn->query($state);
+$types = $types->fetchAll(PDO::FETCH_ASSOC);
+$states = $states->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_POST['search'])) {
-
+    if (!empty($_POST['type'])) {
+        $search_param[] = "type = '{$_POST['type']}'";
+    }
+    if (!empty($_POST['state'])) {
+        $search_param[] = "state = '{$_POST['state']}'";
+    }
+    if (!empty($_POST['Title'])) {
+        $search_param[] = "title LIKE '{$_POST['title']}'";
+    }
+    $filter = ("SELECT * FROM Books where" . implode(" AND ", $search_param));
+    $filter = $conn->query($filter);
+    $result = $filter->fetchAll(PDO::FETCH_ASSOC);
 } else {
     // Get the current date
     $current_date = date('Y-m-d');
@@ -65,35 +82,94 @@ if (isset($_POST['search'])) {
             <form method="post">
                 <div class="row g-3 align-items-center border border-secondary border-2 rounded pb-3 fs-5 px-3 fw-bold">
                     <div class="col-auto">
-                        <label for="inputPassword6" class="col-form-label">Type</label>
+                        <label for="type" class="col-form-label">Type</label>
                     </div>
                     <div class="col-auto">
-                        <input type="select" id="inputPassword6" class="form-control"
+                        <select type="select" id="type" class="form-select" name="type"
+                            aria-describedby="passwordHelpInline">
+                            <option value=""></option>
+
+                            <?php
+                            for ($i = 0; $i < count($types); $i++) {
+                                $type = $types[$i]['type'];
+                                echo "<option value='$type'>$type</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label for="State" class="col-form-label">State</label>
+                    </div>
+                    <div class="col-auto">
+                        <select type="select" id="State" name="State" class="form-select"
+                            aria-describedby="passwordHelpInline">
+                            <option value=""></option>
+                            <?php
+                            for ($i = 0; $i < count($states); $i++) {
+                                $state = $states[$i]['state'];
+                                echo "<option value='$state'>$state</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <label for="Title" class="col-form-label">Title</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="select" id="Title" name="Title" class="form-control"
                             aria-describedby="passwordHelpInline">
                     </div>
                     <div class="col-auto">
-                        <label for="inputPassword6" class="col-form-label">State</label>
-                    </div>
-                    <div class="col-auto">
-                        <input type="select" id="inputPassword6" class="form-control"
-                            aria-describedby="passwordHelpInline">
-                    </div>
-                    <div class="col-auto">
-                        <label for="inputPassword6" class="col-form-label">Title</label>
-                    </div>
-                    <div class="col-auto">
-                        <input type="select" id="inputPassword6" class="form-control"
-                            aria-describedby="passwordHelpInline">
-                    </div>
-                    <div class="col-auto">
-                        <input type="submit" name="search" value="Search" class="btn"
-                            aria-describedby="passwordHelpInline">
+                        <input type="submit" name="search" value="Search" class="btn" aria-describedby="submit">
                     </div>
                 </div>
             </form>
         </section>
         <?php
         if (isset($_POST['search'])) {
+            ?>
+            <section class="px-5 mt-5">
+                <div class="px-5">
+                    <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                        Your search result
+                    </div>
+                    <div class="d-flex cards">
+                        <?php
+                        foreach ($result as $book) {
+                            ?>
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <img src="../<?php echo $book['image'] ?>" alt="book-cover"
+                                            style="width:310px;height:400px;">
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <h2 class="mt-5 fs-4">
+                                            <?php echo $book['title'] ?>
+                                        </h2>
+                                        <p class="text-black">
+                                            <?php echo $book['author'] ?>
+                                        </p>
+                                        <p class="text-black">
+                                            <?php echo $book['publishing_date'] ?>
+                                        </p>
+                                        <p class="text-black">
+                                            <?php echo $book['state'] ?>
+                                        </p>
+                                        <form id="reserve" action="" method="post">
+                                            <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
+                                            <button type="submit" name="Reserve" class="reservation px-4 py-2"
+                                                data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <?php
+                        }
+        } else {
             ?>
             <section class="px-5 mt-5">
                 <div class="px-5">
@@ -133,92 +209,50 @@ if (isset($_POST['search'])) {
                             </div>
                             <?php
                         }
+                        ?>
+                    </div>
+                </div>
+            </section>
+            <section class="px-5 mt-5 mb-5">
+                <div class="px-5">
+                    <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                        books
+                    </div>
+                    <div class="d-flex flex-wrap" style="gap: 5em;">
+                        <?php
+                        foreach ($books as $book) {
+                            ?>
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <img src="../<?php echo $book['image'] ?>" alt="book-cover"
+                                            style="width:310px;height:400px;">
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <h2 class="mt-5 fs-4">
+                                            <?php echo $book['title'] ?>
+                                        </h2>
+                                        <p class="text-black">
+                                            <?php echo $book['author'] ?>
+                                        </p>
+                                        <p class="text-black">
+                                            <?php echo $book['publishing_date'] ?>
+                                        </p>
+                                        <p class="text-black">
+                                            <?php echo $book['state'] ?>
+                                        </p>
+                                        <form id="reserve" action="" method="post">
+                                            <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
+                                            <button type="submit" name="Reserve" class="reservation px-4 py-2"
+                                                data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
         }
         ?>
-                </div>
-            </div>
-        </section>
-        <section class="px-5 mt-5">
-            <div class="px-5">
-                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
-                    New books
-                </div>
-                <div class="d-flex cards">
-                    <?php
-                    foreach ($new_books as $book) {
-                        ?>
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <img src="../<?php echo $book['image'] ?>" alt="book-cover"
-                                        style="width:310px;height:400px;">
-                                </div>
-                                <div class="flip-card-back">
-                                    <h2 class="mt-5 fs-4">
-                                        <?php echo $book['title'] ?>
-                                    </h2>
-                                    <p class="text-black">
-                                        <?php echo $book['author'] ?>
-                                    </p>
-                                    <p class="text-black">
-                                        <?php echo $book['publishing_date'] ?>
-                                    </p>
-                                    <p class="text-black">
-                                        <?php echo $book['state'] ?>
-                                    </p>
-                                    <form id="reserve" action="" method="post">
-                                        <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
-                                        <button type="submit" name="Reserve" class="reservation px-4 py-2"
-                                            data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                    }
-                    ?>
-                </div>
-            </div>
-        </section>
-        <section class="px-5 mt-5 mb-5">
-            <div class="px-5">
-                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
-                    books
-                </div>
-                <div class="d-flex flex-wrap" style="gap: 5em;">
-                    <?php
-                    foreach ($books as $book) {
-                        ?>
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">
-                                    <img src="../<?php echo $book['image'] ?>" alt="book-cover"
-                                        style="width:310px;height:400px;">
-                                </div>
-                                <div class="flip-card-back">
-                                    <h2 class="mt-5 fs-4">
-                                        <?php echo $book['title'] ?>
-                                    </h2>
-                                    <p class="text-black">
-                                        <?php echo $book['author'] ?>
-                                    </p>
-                                    <p class="text-black">
-                                        <?php echo $book['publishing_date'] ?>
-                                    </p>
-                                    <p class="text-black">
-                                        <?php echo $book['state'] ?>
-                                    </p>
-                                    <form id="reserve" action="" method="post">
-                                        <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
-                                        <button type="submit" name="Reserve" class="reservation px-4 py-2"
-                                            data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                    }
-                    ?>
                 </div>
             </div>
         </section>
