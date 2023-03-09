@@ -1,14 +1,15 @@
 <?php
 session_start();
 include "../head.php";
-include "../connect.php";
-// include "reservation.php"
-if (isset($_POST['Reserve'])) {
-    $id_book = $_POST['id'];
-    $sql = "SELECT * FROM `Books` WHERE `id_book`='$id_book'";
-    $stmt = $conn->query($sql);
-    $reserve = $stmt->fetch(PDO::FETCH_ASSOC);
-}
+// include "../connect.php";
+// // include "reservation.php"
+// if (isset($_POST['Reserve'])) {
+//     $id_book = $_POST['id'];
+//     echo $id_book;
+//     // $sql = "SELECT * FROM `Books` WHERE `id_book`='$id_book'";
+//     // $stmt = $conn->query($sql);
+//     // $reserve = $stmt->fetch(PDO::FETCH_ASSOC);
+// }
 ?>
 
 <body>
@@ -80,17 +81,18 @@ if (isset($_POST['Reserve'])) {
                     <div class="flip-card">
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
-                                <img src="../images/a-Dolls-house.jpg" alt="Avatar" style="width:310px;height:400px;">
+                                <img src="../images/a-Dolls-house.jpg" alt="book-cover"
+                                    style="width:310px;height:400px;">
                             </div>
                             <div class="flip-card-back">
                                 <h2 class="mt-5 fs-4">a Dolls house</h2>
                                 <p class="text-black">Fyodor Dostoevsky</p>
                                 <p class="text-black">1928</p>
                                 <p class="text-black">Good condition</p>
-                                <form method="post">
-                                    <input type="hidden" name="id" value="ilias is the best">
-                                    <button type="submit" name="Reserve" class="reservation px-4 py-2"
-                                        data-bs-toggle="modal" data-bs-target="#reservation">Reserve</button>
+                                <form id="reserve" action="" method="post">
+                                    <input type="hidden" name="id" value="56">
+                                    <button type="submit" name="Reserve" onclick="submitForm(event)"
+                                        class="reservation px-4 py-2">Reserve</button>
                                 </form>
                             </div>
                         </div>
@@ -100,24 +102,20 @@ if (isset($_POST['Reserve'])) {
         </section>
     </main>
     <!-- modal reservations -->
-    <div class="modal fade" id="reservation" tabindex="-1" aria-labelledby="reservation" aria-hidden="true">
+    <div class="modal fade" id="reservation-modal" tabindex="-1" aria-labelledby="reservation" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body p-0">
                     <div class="card">
                         <div class="row g-0">
                             <div class="col-md-4">
-                                <img src="../images/a-Dolls-house.jpg" alt="book image" class="img-fluid rounded-start">
+                                <img src="" alt="book image" id="book-image" class="img-fluid rounded-start">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body p-5">
-                                    <h5 class="card-title text-black">Book title : <?php echo $reserve['title']?></h5>
-                                    <p class="card-text text-black">written by : <?php echo $reserve['author'] ?></p>
-                                    <p class="card-text text-black">Published in : <?php echo $reserve['publishing_date'] ?></p>
-                                    <p class="card-text text-black">State : <?php echo $reserve['state']?></p>
-                                    <p class="text-danger">NB*: every reservation last for 24H </p>
-                                    <!-- <button type="submit" name="confirmation" class="confirmation">Confirm</button> -->
+                                    loading...
                                 </div>
+                                <!-- <button type="submit" name="confirmation" class="confirmation">Confirm</button> -->
                             </div>
                         </div>
                     </div>
@@ -125,6 +123,26 @@ if (isset($_POST['Reserve'])) {
             </div>
         </div>
     </div>
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+            var form = document.getElementById("reserve");
+            var item_id = form.elements["id"].value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "process_reservation.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    // Display the reservation details in the modal
+                    var response = JSON.parse(xhr.responseText);
+                    document.getElementById("reservation-modal").querySelector(".card-body").innerHTML = response.details;
+                    document.getElementById("book-image").src = response.image;
+                    $('#reservation-modal').modal('show');
+                }
+            }
+            xhr.send("id=" + encodeURIComponent(item_id));
+        }
+    </script>
 </body>
 
 </html>
