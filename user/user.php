@@ -2,31 +2,36 @@
 session_start();
 include "../head.php";
 include "../connect.php";
-// $sql = "SELECT * FROM `Books` WHERE `date_of_purchase` >= CURDATE() ORDER BY `date_of_purchase` ASC LIMIT 4";
-// Get the current date
-$current_date = date('Y-m-d');
 
-// Prepare and execute the query
-try {
-    $stmt = $conn->prepare('SELECT * FROM Books WHERE state="New" ORDER BY ABS(DATEDIFF(date_of_purchase, NOW())) ASC LIMIT 4');
-    $stmt->execute();
-} catch (PDOException $e) {
-    echo 'Error executing query: ' . $e->getMessage();
-    exit();
+if (isset($_POST['search'])) {
+
+} else {
+    // Get the current date
+    $current_date = date('Y-m-d');
+
+    // Prepare and execute the query
+    try {
+        $stmt = $conn->prepare('SELECT * FROM Books WHERE state="New" ORDER BY ABS(DATEDIFF(date_of_purchase, NOW())) ASC LIMIT 4');
+        $stmt->execute();
+    } catch (PDOException $e) {
+        echo 'Error executing query: ' . $e->getMessage();
+        exit();
+    }
+
+    try {
+        $books = $conn->prepare('SELECT * FROM Books WHERE state="Good condition" LIMIT 8');
+        $books->execute();
+    } catch (PDOException $e) {
+        echo 'Error executing query: ' . $e->getMessage();
+        exit();
+    }
+
+    // Fetch the results
+    $new_books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $books = $books->fetchAll(PDO::FETCH_ASSOC);
 }
-
-try {
-    $books = $conn->prepare('SELECT * FROM Books WHERE state="Good condition" LIMIT 8');
-    $books->execute();
-} catch (PDOException $e) {
-    echo 'Error executing query: ' . $e->getMessage();
-    exit();
-}
-
-// Fetch the results
-$new_books = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$books = $books->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg bg-warning-subtle">
@@ -86,6 +91,52 @@ $books = $books->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             </form>
+        </section>
+        <?php
+        if (isset($_POST['search'])) {
+            ?>
+            <section class="px-5 mt-5">
+                <div class="px-5">
+                    <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                        New books
+                    </div>
+                    <div class="d-flex cards">
+                        <?php
+                        foreach ($new_books as $book) {
+                            ?>
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <img src="../<?php echo $book['image'] ?>" alt="book-cover"
+                                            style="width:310px;height:400px;">
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <h2 class="mt-5 fs-4">
+                                            <?php echo $book['title'] ?>
+                                        </h2>
+                                        <p class="text-black">
+                                            <?php echo $book['author'] ?>
+                                        </p>
+                                        <p class="text-black">
+                                            <?php echo $book['publishing_date'] ?>
+                                        </p>
+                                        <p class="text-black">
+                                            <?php echo $book['state'] ?>
+                                        </p>
+                                        <form id="reserve" action="" method="post">
+                                            <input type="hidden" name="id" value="<?php echo $book['Id_book'] ?>">
+                                            <button type="submit" name="Reserve" class="reservation px-4 py-2"
+                                                data-bookid="<?php echo $book['Id_book'] ?>">Reserve</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
+        }
+        ?>
+                </div>
+            </div>
         </section>
         <section class="px-5 mt-5">
             <div class="px-5">
@@ -198,9 +249,9 @@ $books = $books->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-    <?php 
+    <?php
     include "../footer.php"
-    ?>
+        ?>
     <script>
         $(document).on('click', '.reservation', function () {
             event.preventDefault();
