@@ -2,7 +2,6 @@
 session_start();
 include "../head.php";
 include "../connect.php";
-
 $type = "SELECT DISTINCT `type` FROM `books`";
 $state = "SELECT DISTINCT `state` FROM `books`";
 $types = $conn->query($type);
@@ -14,8 +13,8 @@ if (isset($_POST['search'])) {
     if (!empty($_POST['type'])) {
         $search_param[] = "type = '{$_POST['type']}'";
     }
-    if (!empty($_POST['state'])) {
-        $search_param[] = "state = '{$_POST['state']}'";
+    if (!empty($_POST['State'])) {
+        $search_param[] = "state = '{$_POST['State']}'";
     }
     if (!empty($_POST['title'])) {
         $search_param[] = "title LIKE '%{$_POST['title']}'";
@@ -26,7 +25,6 @@ if (isset($_POST['search'])) {
     if (!empty($search_param)) {
         $filter .= " WHERE " . implode(" AND ", $search_param);
     }
-
     $filter = $conn->query($filter);
     $result = $filter->fetchAll(PDO::FETCH_ASSOC);
 } else {
@@ -85,6 +83,16 @@ if (isset($_POST['search'])) {
         </nav>
     </header>
     <main>
+        <?php
+        if (isset($success)) {
+            include "confirmation.php";
+            ?>
+            <div class="alert alert-success" role="alert">
+                <?php echo $success ?>
+            </div>
+            <?php
+        }
+        ?>
         <section class="d-flex justify-content-center mt-5">
             <form method="post">
                 <div class="row g-3 align-items-center border border-secondary border-2 rounded pb-3 fs-5 px-3 fw-bold">
@@ -282,7 +290,7 @@ if (isset($_POST['search'])) {
                                     <div class="card-body p-5">
                                         loading...
                                     </div>
-                                    <input type="hidden" id="input">
+                                    <input type="hidden" id="input" name="input">
                                     <button type="submit" name="confirmation" class="confirmation">Confirm</button>
                                 </form>
                             </div>

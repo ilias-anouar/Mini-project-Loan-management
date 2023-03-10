@@ -36,4 +36,15 @@ class Member
 
 }
 
+class Reservation {
+    public $reservation_date;
+    public $id_book;
+    public $id_member;
+    public function __construct($reservation_date,$id_book,$id_member){
+        $this->id_book = $id_book;
+        $this->reservation_date = $reservation_date;
+        $this->id_member = $id_member;
+    }
+}
+
 ?>

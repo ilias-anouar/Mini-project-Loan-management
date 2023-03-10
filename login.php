@@ -51,7 +51,7 @@ if (isset($_POST['login'])) {
     $nickname = test_input($_POST['nickname']);
     $password = test_input($_POST['password']);
     $cpassword = test_input($_POST['cpassword']);
-    
+
     $member = new Member($name, $mail, $address, $phone, $cin, $date, $occupation, $nickname);
 
     $check_mail = "SELECT * FROM `members` WHERE `email`='$member->mail'";
@@ -61,6 +61,7 @@ if (isset($_POST['login'])) {
     $check_nickname = "SELECT * FROM `members` WHERE `nickname`='$member->nickname'";
     $stmt = $conn->query($check_nickname);
     $checked_nickname = $stmt->fetch(PDO::FETCH_ASSOC);
+    
     if (is_array($checked_mail)) {
         $mail_error = "This email is already used";
     } elseif (is_array($check_nickname)) {
