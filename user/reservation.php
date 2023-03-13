@@ -1,6 +1,16 @@
 <?php
+session_start();
 require "../connect.php";
 include "../head.php";
+$id_member = $_SESSION['id_member'];
+$reservation = "SELECT * FROM reservation WHERE id_member = '$id_member'";
+$result_reservation = $conn->query($reservation);
+$my_reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
+
+$loan = "SELECT * FROM loan WHERE id_member = '$id_member'";
+$result_loan = $conn->query($loan);
+$my_loan = $result_loan->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <body>
@@ -21,10 +31,10 @@ include "../head.php";
                             <a class="nav-link" href="#">News</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">My reservations</a>
+                            <a class="nav-link" href="reservation.php">My reservations</a>
                         </li>
                         <li class="nav-item">
-                            <button type="button" class="btn rounded-0 fs-4">Profile</button>
+                            <a type="button" href="profile.php" class="btn rounded-0 fs-4">Profile</a>
                         </li>
                     </ul>
                 </div>
@@ -32,51 +42,126 @@ include "../head.php";
         </nav>
     </header>
     <main>
-        <section class="d-flex justify-content-center mt-5">
-            <form method="post">
-                <div class="row g-3 align-items-center border border-secondary border-2 rounded pb-3 fs-5 px-3 fw-bold">
-                    <div class="col-auto">
-                        <label for="type" class="col-form-label">Type</label>
-                    </div>
-                    <div class="col-auto">
-                        <select type="select" id="type" class="form-select" name="type"
-                            aria-describedby="passwordHelpInline">
-                            <option value=""></option>
-
-                            <?php
-                            for ($i = 0; $i < count($types); $i++) {
-                                $type = $types[$i]['type'];
-                                echo "<option value='$type'>$type</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <label for="State" class="col-form-label">State</label>
-                    </div>
-                    <div class="col-auto">
-                        <select type="select" id="State" name="State" class="form-select"
-                            aria-describedby="passwordHelpInline">
-                            <option value=""></option>
-                            <?php
-                            for ($i = 0; $i < count($states); $i++) {
-                                $state = $states[$i]['state'];
-                                echo "<option value='$state'>$state</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-auto">
-                        <label for="title" class="col-form-label">Title</label>
-                    </div>
-                    <div class="col-auto">
-                        <input type="select" id="title" name="title" class="form-control"
-                            aria-describedby="passwordHelpInline">
-                    </div>
-                    <div class="col-auto">
-                        <input type="submit" name="search" value="Search" class="btn" aria-describedby="submit">
-                    </div>
+        <section class="px-5 mt-5">
+            <div class="px-5">
+                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                    My reservation
                 </div>
-            </form>
+                <div>
+                    <table class="table table-bordered text-center fw-bold fs-4">
+                        <tr>
+                            <th>Cover image</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Author name</th>
+                            <th>Action</th>
+                        </tr>
+                        <?php
+                        foreach ($my_reservation as $book) {
+                            $id_book = $book['Id_book'];
+                            $id_reservation = $book['Id_reservation'];
+                            $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
+                            $book = $conn->query($book);
+                            $resulte = $book->Fetch(PDO::FETCH_ASSOC);
+                            ?>
+                            <tr>
+                                <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
+                                        style="width:300px;height:390px;" class="p-0"></td>
+                                <td class="align-middle">
+                                    <?php echo $resulte['title'] ?>
+                                </td>
+                                <td class="align-middle">
+                                    <?php echo $resulte['type'] ?>
+                                </td>
+                                <td class="align-middle">
+                                    <?php echo $resulte['author'] ?>
+                                </td>
+                                <td class="align-middle">
+                                    <button type="button" name="check_cancel" data-bs-toggle="modal"
+                                        data-bs-target="#cancel-modal<?php echo $id_reservation ?>">cancel</button>
+                                </td>
+                            </tr>
+                            <!-- modal cancel -->
+                            <div class="modal fade" id="cancel-modal<?php echo $id_reservation ?>" tabindex="-1"
+                                aria-labelledby="reservation" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-body p-3 text-center">
+                                            <form action="cancel.php" method="get">
+                                                <div class="card-body p-5 fw-bold fs-5">
+                                                    are you sure you want to cancel this reservation
+                                                </div>
+                                                <input type="hidden" id="cancel" name="cancel"
+                                                    value="<?php echo $id_reservation ?>">
+                                                <button type="submit" class="btn-danger px-3 py-2"
+                                                    name="Confirm">Confirm</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </table>
+                </div>
+            </div>
         </section>
+        <section class="px-5 mt-5">
+            <div class="px-5">
+                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                    My borrowing
+                </div>
+                <div>
+                    <table class="table table-bordered text-center fw-bold fs-4">
+                        <tr>
+                            <th>Cover image</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Author name</th>
+                            <th>info</th>
+                        </tr>
+                        <?php
+                        if (count($my_loan)<0) {
+                            foreach ($my_loan as $book) {
+                                $id_book = $book['Id_book'];
+                                $Id_loan = $book['Id_loan'];
+                                $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
+                                $book = $conn->query($book);
+                                $resulte = $book->Fetch(PDO::FETCH_ASSOC);
+                                ?>
+                                <tr>
+                                    <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
+                                            style="width:300px;height:390px;" class="p-0"></td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['title'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['type'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['author'] ?>
+                                    </td>
+                                    <td class="align-middle">
+
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="alert alert-info text-center" role="alert">
+                                you don't have any currunt reservation
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+    <?php
+    include "../footer.php"
+        ?>
 </body>
