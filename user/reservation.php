@@ -10,7 +10,6 @@ $my_reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
 $loan = "SELECT * FROM loan WHERE id_member = '$id_member'";
 $result_loan = $conn->query($loan);
 $my_loan = $result_loan->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <body>
@@ -57,48 +56,56 @@ $my_loan = $result_loan->fetchAll(PDO::FETCH_ASSOC);
                             <th>Action</th>
                         </tr>
                         <?php
-                        foreach ($my_reservation as $book) {
-                            $id_book = $book['Id_book'];
-                            $id_reservation = $book['Id_reservation'];
-                            $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
-                            $book = $conn->query($book);
-                            $resulte = $book->Fetch(PDO::FETCH_ASSOC);
-                            ?>
-                            <tr>
-                                <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
-                                        style="width:300px;height:390px;" class="p-0"></td>
-                                <td class="align-middle">
-                                    <?php echo $resulte['title'] ?>
-                                </td>
-                                <td class="align-middle">
-                                    <?php echo $resulte['type'] ?>
-                                </td>
-                                <td class="align-middle">
-                                    <?php echo $resulte['author'] ?>
-                                </td>
-                                <td class="align-middle">
-                                    <button type="button" name="check_cancel" data-bs-toggle="modal"
-                                        data-bs-target="#cancel-modal<?php echo $id_reservation ?>">cancel</button>
-                                </td>
-                            </tr>
-                            <!-- modal cancel -->
-                            <div class="modal fade" id="cancel-modal<?php echo $id_reservation ?>" tabindex="-1"
-                                aria-labelledby="reservation" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-body p-3 text-center">
-                                            <form action="cancel.php" method="get">
-                                                <div class="card-body p-5 fw-bold fs-5">
-                                                    are you sure you want to cancel this reservation
-                                                </div>
-                                                <input type="hidden" id="cancel" name="cancel"
-                                                    value="<?php echo $id_reservation ?>">
-                                                <button type="submit" class="btn-danger px-3 py-2"
-                                                    name="Confirm">Confirm</button>
-                                            </form>
+                        if (count($my_reservation) > 0) {
+                            foreach ($my_reservation as $book) {
+                                $id_book = $book['Id_book'];
+                                $id_reservation = $book['Id_reservation'];
+                                $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
+                                $book = $conn->query($book);
+                                $resulte = $book->Fetch(PDO::FETCH_ASSOC);
+                                ?>
+                                <tr>
+                                    <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
+                                            style="width:300px;height:390px;" class="p-0"></td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['title'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['type'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['author'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" name="check_cancel" data-bs-toggle="modal"
+                                            data-bs-target="#cancel-modal<?php echo $id_reservation ?>">cancel</button>
+                                    </td>
+                                </tr>
+                                <!-- modal cancel -->
+                                <div class="modal fade" id="cancel-modal<?php echo $id_reservation ?>" tabindex="-1"
+                                    aria-labelledby="reservation" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-body p-3 text-center">
+                                                <form action="cancel.php" method="get">
+                                                    <div class="card-body p-5 fw-bold fs-5">
+                                                        are you sure you want to cancel this reservation
+                                                    </div>
+                                                    <input type="hidden" id="cancel" name="cancel"
+                                                        value="<?php echo $id_reservation ?>">
+                                                    <button type="submit" class="btn-danger px-3 py-2"
+                                                        name="Confirm">Confirm</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="alert alert-info text-center" role="alert">
+                                you don't have any currunt reseravation
                             </div>
                             <?php
                         }
@@ -122,7 +129,7 @@ $my_loan = $result_loan->fetchAll(PDO::FETCH_ASSOC);
                             <th>info</th>
                         </tr>
                         <?php
-                        if (count($my_loan)<0) {
+                        if (count($my_loan) < 0) {
                             foreach ($my_loan as $book) {
                                 $id_book = $book['Id_book'];
                                 $Id_loan = $book['Id_loan'];
@@ -151,7 +158,7 @@ $my_loan = $result_loan->fetchAll(PDO::FETCH_ASSOC);
                         } else {
                             ?>
                             <div class="alert alert-info text-center" role="alert">
-                                you don't have any currunt reservation
+                                you don't have any currunt borrowing
                             </div>
                             <?php
                         }

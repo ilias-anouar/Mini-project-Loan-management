@@ -11,8 +11,6 @@ function test_input($data)
 }
 if (isset($_POST['login'])) {
     $nickname = $_POST["nickname"];
-    // $password = ;
-
     $sql = "SELECT * FROM `members` WHERE `nickname`='$nickname'";
     $stmt = $conn->query($sql);
     if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
