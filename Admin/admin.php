@@ -66,7 +66,7 @@ $reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
                             <a class="nav-link" href="admin.php">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">News</a>
+                            <a class="nav-link" href="loan.php">Borrowing</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="reservation.php">My reservations</a>
@@ -103,7 +103,7 @@ $reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
     <section class="px-5 mt-5">
         <div class="px-5">
             <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
-                My reservation
+                Today reservation
             </div>
             <div>
                 <table class="table table-bordered text-center fw-bold fs-4">
@@ -129,6 +129,7 @@ $reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
                             $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
                             $book = $conn->query($book);
                             $resulte = $book->Fetch(PDO::FETCH_ASSOC);
+
                             ?>
                             <tr>
                                 <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
@@ -143,7 +144,12 @@ $reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
                                     <?php echo $date ?>
                                 </td>
                                 <td class="align-middle">
-                                    <button class="btn_valid" type="button" name="valid_reservation">Valid</button>
+                                    <form action="Valid.php" method="post">
+                                        <input type="hidden" value="<?php echo $id_reservation ?>" name="valid_reseravtion">
+                                        <input type="hidden" value="<?php echo $id_memebr ?>" name="valid_member">
+                                        <input type="hidden" value="<?php echo $id_book ?>" name="valid_book">
+                                        <button class="btn_valid" type="button" name="valid_reservation">Valid</button>
+                                    </form>
                                 </td>
                             </tr>
                             <?php
