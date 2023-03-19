@@ -17,7 +17,7 @@ if (!$reserve) {
 
     $response = array(
         "details" => '<h5 class="card-title text-black">Book title : ' . $reserve['title'] . '</h5>'
-        . '<p class="card-text text-black">Written by : ' . $reserve['author'] . '</p>'
+        . '<input class="card-text text-black">Written by : ' . $reserve['author'] . '</input>'
         . '<p class="card-text text-black">Published in : ' . $reserve['publishing_date'] . '</p>'
         . '<p class="card-text text-black">State : ' . $reserve['state'] . '</p>'
         . '<p class="card-text text-black">Number of pages : ' . $reserve['pages'] . '</p>'

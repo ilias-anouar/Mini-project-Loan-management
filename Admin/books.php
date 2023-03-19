@@ -83,7 +83,7 @@ if (isset($_POST['search'])) {
                             <a class="nav-link" href="loan.php">Borrowing</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="books.php">Books</a>
+                            <a class="nav-link" href="profile.php">add book</a>
                         </li>
                         <li class="nav-item">
                             <a type="button" href="profile.php" class="btn rounded-0 fs-4">Profile</a>
