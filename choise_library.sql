@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 03 mars 2023 à 15:36
+-- Généré le : dim. 19 mars 2023 à 20:45
 -- Version du serveur : 10.4.27-MariaDB
 -- Version de PHP : 8.2.0
 
@@ -160,7 +160,6 @@ CREATE TABLE `loan` (
 
 -- --------------------------------------------------------
 
-
 --
 -- Structure de la table `members`
 --
@@ -175,11 +174,19 @@ CREATE TABLE `members` (
   `date_of_birth` date NOT NULL,
   `type` varchar(50) NOT NULL,
   `nickname` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL,
+  `password` varchar(300) NOT NULL,
   `opening_date` date NOT NULL,
   `penalty` int(11) NOT NULL,
   `Role` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `members`
+--
+
+INSERT INTO `members` (`id_member`, `full_name`, `address`, `email`, `phone`, `C_I_N`, `date_of_birth`, `type`, `nickname`, `password`, `opening_date`, `penalty`, `Role`) VALUES
+(2, 'ilias', 'hay el mers achennad', 'ilias@gmail.com', 654535351, 'KN76757', '2001-07-08', 'Student', 'ilias', '$2y$10$SqB3lWF5HXY54kRA77FMWeed5.vSRAecKK/Q.xw/vyAbyQrUnC16m', '2023-03-19', 5, 0),
+(3, 'admin', 'hay el mers achennad', 'admin435choise@gmail.com', 654532675, 'N546427', '2001-07-08', 'Student', 'admin', '$2y$10$0RYdBbaz6Md51CB.XLuCLej1dco/LdzOwh3T6mqaH6tNaxIAkA2ae', '2023-03-19', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -193,6 +200,15 @@ CREATE TABLE `reservation` (
   `id_member` int(11) NOT NULL,
   `Id_book` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `reservation`
+--
+
+INSERT INTO `reservation` (`Id_reservation`, `reservation_date`, `id_member`, `Id_book`) VALUES
+(1, '2023-03-19 18:17:18', 2, 10),
+(2, '2023-03-19 18:17:22', 2, 12),
+(3, '2023-03-19 18:17:25', 2, 13);
 
 --
 -- Index pour les tables déchargées
@@ -241,19 +257,19 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT pour la table `loan`
 --
 ALTER TABLE `loan`
-  MODIFY `Id_loan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Id_loan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `members`
 --
 ALTER TABLE `members`
-  MODIFY `id_member` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_member` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `Id_reservation` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Id_reservation` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Contraintes pour les tables déchargées
@@ -278,33 +294,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
--- CREATE TRIGGER update_penalty
--- AFTER UPDATE ON `loan`
--- FOR EACH ROW
--- BEGIN
---   IF UPDATE(`return_date`)
---   BEGIN
---     UPDATE `members`
---     SET penalty = 1
---     WHERE EXISTS (
---       SELECT 1 FROM `loan`
---       WHERE `loan`.`id_member` = `members`.`id_member`
---         AND DATEDIFF(day, `loan`.`loan_date`, inserted.`return_date`) > 15
---         AND `loan`.`Id_loan` = inserted.`Id_loan`
---     )
---   END
--- END
-
--- CREATE TRIGGER update_penalty
--- AFTER UPDATE ON `loan`
--- FOR EACH ROW
--- BEGIN
---   IF NEW.`return_date` > OLD.`return_date` AND DATEDIFF(NEW.`return_date`, OLD.`return_date`) > 15 THEN
---     UPDATE `members`
---     SET `penalty` = 1
---     WHERE `id_member` = NEW.`id_member`;
---   END IF;
--- END;
-
-
