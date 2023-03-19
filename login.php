@@ -73,7 +73,6 @@ if (isset($_POST['login'])) {
         $signed_up = "your account is created successfully please log in to your account";
         header("Location: login.php");
     }
-
 }
 ?>
 
