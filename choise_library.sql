@@ -160,6 +160,7 @@ CREATE TABLE `loan` (
 
 -- --------------------------------------------------------
 
+
 --
 -- Structure de la table `members`
 --
@@ -277,3 +278,33 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- CREATE TRIGGER update_penalty
+-- AFTER UPDATE ON `loan`
+-- FOR EACH ROW
+-- BEGIN
+--   IF UPDATE(`return_date`)
+--   BEGIN
+--     UPDATE `members`
+--     SET penalty = 1
+--     WHERE EXISTS (
+--       SELECT 1 FROM `loan`
+--       WHERE `loan`.`id_member` = `members`.`id_member`
+--         AND DATEDIFF(day, `loan`.`loan_date`, inserted.`return_date`) > 15
+--         AND `loan`.`Id_loan` = inserted.`Id_loan`
+--     )
+--   END
+-- END
+
+-- CREATE TRIGGER update_penalty
+-- AFTER UPDATE ON `loan`
+-- FOR EACH ROW
+-- BEGIN
+--   IF NEW.`return_date` > OLD.`return_date` AND DATEDIFF(NEW.`return_date`, OLD.`return_date`) > 15 THEN
+--     UPDATE `members`
+--     SET `penalty` = 1
+--     WHERE `id_member` = NEW.`id_member`;
+--   END IF;
+-- END;
+
+

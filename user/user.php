@@ -112,7 +112,7 @@ if (isset($_GET['confirmation'])) {
                             <a class="nav-link" href="reservation.php">My reservations</a>
                         </li>
                         <li class="nav-item">
-                            <a type="button" href="../profile.php" class="btn rounded-0 fs-4">Profile</a>
+                            <a type="button" href="profile.php" class="btn rounded-0 fs-4">Profile</a>
                         </li>
                     </ul>
                 </div>
