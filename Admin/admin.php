@@ -2,10 +2,72 @@
 session_start();
 include "../head.php";
 include "../connect.php";
+
 // $reservation = "SELECT * FROM reservation WHERE reservation_date = NOW()";
-$today_reservation = "SELECT * FROM reservation";
-$result_reservation = $conn->query($today_reservation);
-$reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($_POST['search'])) {
+    $search_param = array();
+    if (!empty($_POST['title'])) {
+        $title = "title = '{$_POST['title']}'";
+        $book_title = "SELECT Id_book FROM books WHERE $title";
+        $id_book = $conn->query($book_title);
+        $id_book = $id_book->fetch(PDO::FETCH_ASSOC);
+        $id_book = $id_book['Id_book'];
+        $search_param[] = "Id_book = '$id_book'";
+    }
+    if (!empty($_POST['nikename'])) {
+        $nickname = "nickname = '{$_POST['nikename']}'";
+        $nickname = "SELECT id_member FROM members WHERE $nickname";
+        $id_member = $conn->query($nickname);
+        $id_member = $id_member->fetch(PDO::FETCH_ASSOC);
+        $id_member = $id_member['id_member'];
+        $search_param[] = "id_member = '$id_member'";
+    }
+
+
+
+    $filter = "SELECT * FROM reservation";
+    if (!empty($search_param)) {
+        if (count($search_param) == 1) {
+            $filter .= " WHERE " . implode($search_param);
+        } else {
+            $filter .= " WHERE " . implode(" AND ", $search_param);
+        }
+    }
+    $filter = $conn->query($filter);
+    $result = $filter->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $pageId;
+
+    if (isset($_GET['pageId'])) {
+        $pageId = $_GET['pageId'];
+    } else {
+        $pageId = 1;
+    }
+
+    $endIndex = $pageId * 6;
+    $StartIndex = $endIndex - 6;
+
+    $sql = ("SELECT * FROM `reservation` LIMIT 6 OFFSET $StartIndex");
+
+    $page = 'SELECT * FROM reservation';
+
+    $reservation_lentgh = $conn->query($page)->rowCount();
+
+    $pagesNum = 0;
+
+    if (($reservation_lentgh % 6) == 0) {
+
+        $pagesNum = $reservation_lentgh / 6;
+    } else {
+        $pagesNum = ceil($reservation_lentgh / 6);
+    }
+
+    $result_reservation = $conn->query($sql);
+    $reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 ?>
 <style>
     .btn_valid {
@@ -100,72 +162,157 @@ $reservation = $result_reservation->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </form>
     </section>
-    <section class="px-5 mt-5">
-        <div class="px-5">
-            <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
-                Today reservation
-            </div>
-            <div>
-                <table class="table table-bordered text-center fw-bold fs-4">
-                    <tr>
-                        <th>Cover image</th>
-                        <th>Title</th>
-                        <th>User nikename</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                    <?php
-                    if (count($reservation) > 0) {
-                        foreach ($reservation as $book) {
-                            $id_book = $book['Id_book'];
-                            $id_memebr = $book['id_member'];
-                            $date = $book['reservation_date'];
-                            $id_reservation = $book['Id_reservation'];
+    <?php
+    if (isset($_POST['search'])) {
+        ?>
+        <section class="px-5 mt-5">
+            <div class="px-5">
+                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                    search result
+                </div>
+                <div>
+                    <table class="table table-bordered text-center fw-bold fs-4">
+                        <tr>
+                            <th>Cover image</th>
+                            <th>Title</th>
+                            <th>User nikename</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                        <?php
+                        if (count($result) > 0) {
+                            foreach ($result as $book) {
+                                $id_book = $book['Id_book'];
+                                $id_memebr = $book['id_member'];
+                                $date = $book['reservation_date'];
+                                $id_reservation = $book['Id_reservation'];
 
-                            $user_nikename = "SELECT nickname FROM members WHERE id_member = '$id_memebr'";
-                            $nikename = $conn->query($user_nikename);
-                            $nikename = $nikename->Fetch(PDO::FETCH_ASSOC);
+                                $user_nikename = "SELECT nickname FROM members WHERE id_member = '$id_memebr'";
+                                $nikename = $conn->query($user_nikename);
+                                $nikename = $nikename->Fetch(PDO::FETCH_ASSOC);
 
-                            $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
-                            $book = $conn->query($book);
-                            $resulte = $book->Fetch(PDO::FETCH_ASSOC);
+                                $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
+                                $book = $conn->query($book);
+                                $resulte = $book->Fetch(PDO::FETCH_ASSOC);
 
+                                ?>
+                                <tr>
+                                    <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
+                                            style="width:300px;height:390px;" class="p-0"></td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['title'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $nikename['nickname'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $date ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <form action="Valid.php" method="post">
+                                            <input type="hidden" value="<?php echo $id_reservation ?>" name="valid_reseravtion">
+                                            <input type="hidden" value="<?php echo $id_memebr ?>" name="valid_member">
+                                            <input type="hidden" value="<?php echo $id_book ?>" name="valid_book">
+                                            <button class="btn_valid" type="button" name="valid_reservation">Valid</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        } else {
                             ?>
-                            <tr>
-                                <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
-                                        style="width:300px;height:390px;" class="p-0"></td>
-                                <td class="align-middle">
-                                    <?php echo $resulte['title'] ?>
-                                </td>
-                                <td class="align-middle">
-                                    <?php echo $nikename['nickname'] ?>
-                                </td>
-                                <td class="align-middle">
-                                    <?php echo $date ?>
-                                </td>
-                                <td class="align-middle">
-                                    <form action="Valid.php" method="post">
-                                        <input type="hidden" value="<?php echo $id_reservation ?>" name="valid_reseravtion">
-                                        <input type="hidden" value="<?php echo $id_memebr ?>" name="valid_member">
-                                        <input type="hidden" value="<?php echo $id_book ?>" name="valid_book">
-                                        <button class="btn_valid" type="button" name="valid_reservation">Valid</button>
-                                    </form>
-                                </td>
-                            </tr>
+                            <div class="alert alert-info text-center" role="alert">
+                                you don't have any currunt reseravation
+                            </div>
                             <?php
                         }
-                    } else {
                         ?>
-                        <div class="alert alert-info text-center" role="alert">
-                            you don't have any currunt reseravation
-                        </div>
-                        <?php
-                    }
-                    ?>
-                </table>
+                    </table>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+        <?php
+    } else {
+        ?>
+        <section class="px-5 mt-5">
+            <div class="px-5">
+                <div class="h3 fw-bold pb-2 mb-4 text-dark border-bottom border-5 border-dark">
+                    Today reservation
+                </div>
+                <div>
+                    <table class="table table-bordered text-center fw-bold fs-4">
+                        <tr>
+                            <th>Cover image</th>
+                            <th>Title</th>
+                            <th>User nikename</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                        <?php
+                        if (count($reservation) > 0) {
+                            foreach ($reservation as $book) {
+                                $id_book = $book['Id_book'];
+                                $id_memebr = $book['id_member'];
+                                $date = $book['reservation_date'];
+                                $id_reservation = $book['Id_reservation'];
+
+                                $user_nikename = "SELECT nickname FROM members WHERE id_member = '$id_memebr'";
+                                $nikename = $conn->query($user_nikename);
+                                $nikename = $nikename->Fetch(PDO::FETCH_ASSOC);
+
+                                $book = "SELECT * FROM books WHERE Id_book = '$id_book'";
+                                $book = $conn->query($book);
+                                $resulte = $book->Fetch(PDO::FETCH_ASSOC);
+
+                                ?>
+                                <tr>
+                                    <td class="p-0"><img src="../<?php echo $resulte['image'] ?>" alt="cover"
+                                            style="width:300px;height:390px;" class="p-0"></td>
+                                    <td class="align-middle">
+                                        <?php echo $resulte['title'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $nikename['nickname'] ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <?php echo $date ?>
+                                    </td>
+                                    <td class="align-middle">
+                                        <form action="Valid.php" method="post">
+                                            <input type="hidden" value="<?php echo $id_reservation ?>" name="valid_reseravtion">
+                                            <input type="hidden" value="<?php echo $id_memebr ?>" name="valid_member">
+                                            <input type="hidden" value="<?php echo $id_book ?>" name="valid_book">
+                                            <button class="btn_valid" type="button" name="valid_reservation">Valid</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        } else {
+                            ?>
+                            <div class="alert alert-info text-center" role="alert">
+                                you don't have any currunt reseravation
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <?php
+    }
+    ?>
+    <?php if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
+        <nav class="mt-5 mb-5 " aria-label="Page navigation example">
+            <ul class=" flex-wrap pagination justify-content-center">
+                <?php for ($i = 1; $i <= $pagesNum; $i++) { ?>
+                    <li class="page-item"><a class="page-link" href="<?php echo "admin.php?pageId=" . $i ?>"><?php echo $i; ?></a></li>
+                <?php } ?>
+            </ul>
+        </nav>
+    <?php }
+    ?>
     <?php
     include "../footer.php"
         ?>

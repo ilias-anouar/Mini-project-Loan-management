@@ -6,5 +6,4 @@ include "../connect.php";
 $loan = "SELECT * FROM loan";
 $loan = $conn->query($loan);
 $loan = $loan->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
