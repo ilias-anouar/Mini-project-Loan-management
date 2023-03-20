@@ -6,9 +6,12 @@ $id_member = $_POST['valid_member'];
 // $id_loan = 1;
 $return_loan = "UPDATE `loan` SET `return_date` = NOW() WHERE `loan`.`Id_loan` = $id_loan";
 $return_loan = $conn->query($return_loan);
-$check_date = "SELECT return_date,loan_date FROM loan WHERE `Id_loan` = $id_loan";
+$check_date = "SELECT * FROM loan WHERE `Id_loan` = $id_loan";
 $check_date = $conn->query($check_date);
 $check_date = $check_date->fetch(PDO::FETCH_ASSOC);
+// echo "<pre>";
+// var_dump($check_date);
+// echo "</pre>";
 $days = (strtotime($check_date['return_date']) - strtotime($check_date['loan_date'])) / (60 * 60 * 24);
 $interval = floor($days);
 $interval = 16;
@@ -19,7 +22,10 @@ if ($interval > 15) {
     $result = $conn->query($result);
     $result = $result->fetch(PDO::FETCH_ASSOC);
 }
-$delete_loan = "DELETE FROM loan WHERE `loan`.`Id_loan` = $id_loan";
+$id_reservation = $check_date['Id_reservation'];
+$delete_loan = "DELETE FROM loan WHERE `Id_reservation` = $id_reservation";
+$delete_reservation = "DELETE FROM reservation WHERE `Id_reservation` = $id_reservation";
 $delete_loan = $conn->query($delete_loan);
+$delete_reservation = $conn->query($delete_reservation);
 header('Location: loan.php');
 ?>

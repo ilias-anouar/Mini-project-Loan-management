@@ -5,20 +5,13 @@ include "../connect.php";
 if (isset($_POST['search'])) {
     $search_param = array();
     if (!empty($_POST['title'])) {
-        $title = "title = '{$_POST['title']}'";
-        $book_title = "SELECT Id_book FROM books WHERE $title";
-        $id_book = $conn->query($book_title);
-        $id_book = $id_book->fetch(PDO::FETCH_ASSOC);
-        $id_book = $id_book['Id_book'];
-        $search_param[] = "Id_book = '$id_book'";
+        $search_param[] = "title = '{$_POST['title']}'";
     }
     if (!empty($_POST['Author'])) {
-        $Author = "Author = '{$_POST['Author']}'";
-        $Author = "SELECT id_member FROM members WHERE $nickname";
-        $id_member = $conn->query($nickname);
-        $id_member = $id_member->fetch(PDO::FETCH_ASSOC);
-        $id_member = $id_member['id_member'];
-        $search_param[] = "id_member = '$id_member'";
+        $search_param[] = "author = '{$_POST['Author']}'";
+    }
+    if (!empty($_POST['Condition'])) {
+        $search_param[] = "state = '{$_POST['Condition']}'";
     }
 
 
@@ -107,6 +100,12 @@ if (isset($_POST['search'])) {
                 </div>
                 <div class="col-auto">
                     <input type="text" id="Author" name="Author" class="form-control">
+                </div>
+                <div class="col-auto">
+                    <label for="Condition" class="col-form-label">Condition</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="Condition" name="Condition" class="form-control">
                 </div>
                 <div class="col-auto">
                     <input type="submit" name="search" value="Search" class="btn" aria-describedby="submit">
@@ -244,20 +243,55 @@ if (isset($_POST['search'])) {
     <!-- add modal -->
     <div class="modal fade" id="add-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+            <div class="modal-content text-center">
+                <div class="modal-header text-center">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">add book</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <div id="information">
+                        <form action="add.php" method="get">
+                            <div class="d-flex">
+                                <div class="w-100 p-5">
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">title</label>
+                                        <input type="text" name="title" class="form-control" required="">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">author</label>
+                                        <input type="text" name="author" class="form-control" required="">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">image</label>
+                                        <input type="file" class="form-control" name="image" required="">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">state</label>
+                                        <input type="text" class="form-control" name="state" required="">
+                                    </div>
+                                </div>
+                                <div class="w-100 p-5">
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">publishing date</label>
+                                        <input type="date" class="form-control" name="publishing_date" required="">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">pages</label>
+                                        <input type="number" class="form-control" name="pages" required="">
+                                    </div>
+                                    <div class=" mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">type</label>
+                                        <input type="text" class="form-control" name="type" required="">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn mb-3" type="submit" name="update_prof">add book</button>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
     </div>
     <?php
     include "../footer.php"

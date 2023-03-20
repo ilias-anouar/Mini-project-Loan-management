@@ -249,7 +249,7 @@ if (isset($_POST['search'])) {
                                 $id_book = $book['Id_book'];
                                 $id_memebr = $book['id_member'];
                                 $date = $book['loan_date'];
-                                $id_loan = $book['Id_reservation'];
+                                $id_loan = $book['Id_loan'];
 
                                 $user_nikename = "SELECT nickname FROM members WHERE id_member = '$id_memebr'";
                                 $nikename = $conn->query($user_nikename);
