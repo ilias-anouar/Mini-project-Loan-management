@@ -12,9 +12,9 @@ if (isset($_POST['search'])) {
         $id_book = $id_book['Id_book'];
         $search_param[] = "Id_book = '$id_book'";
     }
-    if (!empty($_POST['nikename'])) {
-        $nickname = "nickname = '{$_POST['nikename']}'";
-        $nickname = "SELECT id_member FROM members WHERE $nickname";
+    if (!empty($_POST['Author'])) {
+        $Author = "Author = '{$_POST['Author']}'";
+        $Author = "SELECT id_member FROM members WHERE $nickname";
         $id_member = $conn->query($nickname);
         $id_member = $id_member->fetch(PDO::FETCH_ASSOC);
         $id_member = $id_member['id_member'];
@@ -23,7 +23,7 @@ if (isset($_POST['search'])) {
 
 
 
-    $filter = "SELECT * FROM loan";
+    $filter = "SELECT * FROM books";
     if (!empty($search_param)) {
         if (count($search_param) == 1) {
             $filter .= " WHERE " . implode($search_param);
@@ -83,7 +83,7 @@ if (isset($_POST['search'])) {
                             <a class="nav-link" href="loan.php">Borrowing</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="profile.php">add book</a>
+                            <a class="nav-link" data-bs-toggle="modal" data-bs-target="#add-modal">add book</a>
                         </li>
                         <li class="nav-item">
                             <a type="button" href="profile.php" class="btn rounded-0 fs-4">Profile</a>
@@ -103,10 +103,10 @@ if (isset($_POST['search'])) {
                     <input type="text" id="title" name="title" class="form-control">
                 </div>
                 <div class="col-auto">
-                    <label for="nikename" class="col-form-label">User nikename</label>
+                    <label for="Author" class="col-form-label">Author name</label>
                 </div>
                 <div class="col-auto">
-                    <input type="text" id="nikename" name="nikename" class="form-control">
+                    <input type="text" id="Author" name="Author" class="form-control">
                 </div>
                 <div class="col-auto">
                     <input type="submit" name="search" value="Search" class="btn" aria-describedby="submit">
@@ -207,7 +207,7 @@ if (isset($_POST['search'])) {
     </section>
     <?php if ($_SERVER["REQUEST_METHOD"] == "GET") { ?>
         <nav class="mt-5 mb-5 " aria-label="Page navigation example">
-            <ul class=" flex-wrap pagination justify-content-center">
+            <ul class="pagination justify-content-center">
                 <?php for ($i = 1; $i <= $pagesNum; $i++) { ?>
                     <li class="page-item"><a class="page-link" href="<?php echo "books.php?pageId=" . $i ?>"><?php echo $i; ?></a></li>
                 <?php } ?>
@@ -237,6 +237,24 @@ if (isset($_POST['search'])) {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- add modal -->
+    <div class="modal fade" id="add-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
