@@ -216,7 +216,7 @@ if (isset($_POST['search'])) {
     <?php }
     ?>
     <!-- modal reservations -->
-    <div class="modal fade" id="reservation-modal" tabindex="-1" aria-labelledby="reservation" aria-hidden="true">
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="reservation" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body p-0">
@@ -227,7 +227,7 @@ if (isset($_POST['search'])) {
                                 <!-- <p class="text-danger">NB* : every reservation last for 24H </p> -->
                             </div>
                             <div class="col-md-8">
-                                <form action="" method="get">
+                                <form action="edit.php" method="get">
                                     <div class="card-body p-5">
                                         loading...
                                     </div>
@@ -249,15 +249,15 @@ if (isset($_POST['search'])) {
             event.preventDefault();
             var bookid = $(this).data('bookid');
             $.ajax({
-                url: 'process_reservation.php',
+                url: 'process.php',
                 type: 'POST',
                 data: { id: bookid },
                 dataType: 'json',
                 success: function (response) {
-                    $('#reservation-modal .card-body').html(response.details);
-                    $('#reservation-modal #book-image').attr('src', response.image);
-                    $('#reservation-modal #input').val(response.input);
-                    $('#reservation-modal').modal('show');
+                    $('#modal .card-body').html(response.details);
+                    $('#modal #book-image').attr('src', response.image);
+                    $('#modal #input').val(response.input);
+                    $('#modal').modal('show');
                 },
                 error: function (xhr, status, error) {
                     console.log('Error:', error);
