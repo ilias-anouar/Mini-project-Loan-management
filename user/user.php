@@ -354,6 +354,7 @@ if (isset($_GET['confirmation'])) {
     <script>
         $(document).on('click', '.reservation', function () {
             event.preventDefault();
+            $('#reservation-modal').modal('show');
             var bookid = $(this).data('bookid');
             $.ajax({
                 url: 'process_reservation.php',
@@ -364,7 +365,6 @@ if (isset($_GET['confirmation'])) {
                     $('#reservation-modal .card-body').html(response.details);
                     $('#reservation-modal #book-image').attr('src', response.image);
                     $('#reservation-modal #input').val(response.input);
-                    $('#reservation-modal').modal('show');
                 },
                 error: function (xhr, status, error) {
                     console.log('Error:', error);
