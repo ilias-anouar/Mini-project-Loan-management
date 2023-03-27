@@ -14,7 +14,6 @@ $check_date = $check_date->fetch(PDO::FETCH_ASSOC);
 // echo "</pre>";
 $days = (strtotime($check_date['return_date']) - strtotime($check_date['loan_date'])) / (60 * 60 * 24);
 $interval = floor($days);
-$interval = 16;
 if ($interval > 15) {
     $penalty = "UPDATE `members` SET `penalty` = penalty+1 WHERE `id_member` = $id_member";
     $penalty = $conn->query($penalty);
